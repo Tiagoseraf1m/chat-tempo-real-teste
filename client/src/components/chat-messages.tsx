@@ -1,14 +1,16 @@
 import { type Message } from "@shared/schema";
 import MessageBubble from "./message-bubble";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Users } from "lucide-react";
 
 interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
   isTyping: boolean;
+  currentUsername?: string | null;
 }
 
-export default function ChatMessages({ messages, isLoading, isTyping }: ChatMessagesProps) {
+export default function ChatMessages({ messages, isLoading, isTyping, currentUsername }: ChatMessagesProps) {
   const formatTime = (timestamp: Date) => {
     return new Date(timestamp).toLocaleTimeString("pt-BR", {
       hour: "2-digit",
@@ -38,15 +40,11 @@ export default function ChatMessages({ messages, isLoading, isTyping }: ChatMess
     <main className="flex-1 overflow-y-auto px-4 py-6 space-y-4 messages-container">
       {/* Welcome Message */}
       {messages.length === 0 && (
-        <div className="flex items-start space-x-3 animate-fade-in">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center flex-shrink-0">
-            <i className="fas fa-robot text-white text-xs"></i>
-          </div>
-          <div className="flex-1">
-            <div className="bg-blue-600 text-white rounded-2xl rounded-tl-md px-4 py-3 max-w-xs sm:max-w-sm md:max-w-md shadow-sm">
-              <p className="text-sm leading-relaxed">Olá! Sou seu assistente de IA. Como posso ajudá-lo hoje?</p>
-            </div>
-            <p className="text-xs text-slate-400 mt-1 ml-1">Agora mesmo</p>
+        <div className="flex justify-center items-center py-8 animate-fade-in">
+          <div className="text-center text-slate-500">
+            <Users className="h-12 w-12 mx-auto mb-4 text-slate-400" />
+            <p className="text-lg font-medium">Bem-vindo ao chat!</p>
+            <p className="text-sm">Envie uma mensagem para começar a conversar com outros usuários.</p>
           </div>
         </div>
       )}
@@ -57,6 +55,7 @@ export default function ChatMessages({ messages, isLoading, isTyping }: ChatMess
           key={message.id}
           message={message}
           timestamp={formatTime(message.timestamp)}
+          isOwnMessage={currentUsername === message.username}
         />
       ))}
 

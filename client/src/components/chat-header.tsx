@@ -1,21 +1,37 @@
-import { Trash2, Settings } from "lucide-react";
+import { Trash2, Settings, Wifi, WifiOff, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ChatHeaderProps {
   onClearChat: () => void;
+  username?: string | null;
+  isConnected?: boolean;
 }
 
-export default function ChatHeader({ onClearChat }: ChatHeaderProps) {
+export default function ChatHeader({ onClearChat, username, isConnected }: ChatHeaderProps) {
   return (
     <header className="bg-white border-b border-slate-200 px-4 py-4 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center">
-            <i className="fas fa-robot text-white text-lg"></i>
+          <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center">
+            <Users className="text-white text-lg" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-slate-800">Assistente IA</h1>
-            <p className="text-sm text-slate-500">Online</p>
+            <h1 className="text-lg font-semibold text-slate-800">Chat em Tempo Real</h1>
+            <div className="flex items-center space-x-2">
+              {username && (
+                <p className="text-sm text-slate-600">Conectado como {username}</p>
+              )}
+              <div className="flex items-center space-x-1">
+                {isConnected ? (
+                  <Wifi className="h-3 w-3 text-green-500" />
+                ) : (
+                  <WifiOff className="h-3 w-3 text-red-500" />
+                )}
+                <p className="text-xs text-slate-500">
+                  {isConnected ? "Online" : "Desconectado"}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex items-center space-x-2">

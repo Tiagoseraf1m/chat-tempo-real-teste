@@ -1,13 +1,17 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { insertMessageSchema } from "@shared/schema";
+import { insertMessageSchema, userMessageSchema } from "@shared/schema";
 import OpenAI from "openai";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
 });
+
+// Lista de conexões WebSocket ativas
+const wsClients = new Set<WebSocket>();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all messages
@@ -20,64 +24,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Send a message and get AI response
+  // Send a message to real-time chat
   app.post("/api/messages", async (req, res) => {
     try {
-      const validatedData = insertMessageSchema.parse(req.body);
+      const validatedData = userMessageSchema.parse(req.body);
       
       // Store user message
       const userMessage = await storage.createMessage({
-        ...validatedData,
-        role: "user"
+        content: validatedData.content,
+        role: "user",
+        userId: "user-" + Date.now(), // Generate unique ID
+        username: validatedData.username
       });
 
-      // Get AI response
-      try {
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [
-            {
-              role: "system",
-              content: "Você é um assistente de IA útil e educado que responde sempre em português brasileiro. Seja amigável, informativo e mantenha as respostas concisas mas completas."
-            },
-            {
-              role: "user",
-              content: validatedData.content
-            }
-          ],
-          max_tokens: 500,
-          temperature: 0.7,
-        });
+      // Broadcast message to all connected WebSocket clients
+      const messageData = JSON.stringify({
+        type: "new_message",
+        message: userMessage
+      });
 
-        const aiResponseContent = response.choices[0].message.content || "Desculpe, não consegui gerar uma resposta.";
+      wsClients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(messageData);
+        }
+      });
 
-        // Store AI response
-        const aiMessage = await storage.createMessage({
-          content: aiResponseContent,
-          role: "assistant",
-          userId: validatedData.userId
-        });
-
-        res.json({
-          userMessage,
-          aiMessage
-        });
-
-      } catch (aiError) {
-        console.error("OpenAI API error:", aiError);
-        
-        // Store error message
-        const errorMessage = await storage.createMessage({
-          content: "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.",
-          role: "assistant",
-          userId: validatedData.userId
-        });
-
-        res.json({
-          userMessage,
-          aiMessage: errorMessage
-        });
-      }
+      res.json({ message: userMessage });
 
     } catch (error) {
       console.error("Message creation error:", error);
@@ -97,5 +69,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  
+  // Configurar WebSocket Server
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  
+  wss.on('connection', (ws: WebSocket) => {
+    console.log('Nova conexão WebSocket estabelecida');
+    wsClients.add(ws);
+    
+    // Enviar mensagens existentes para o novo cliente
+    storage.getAllMessages().then(messages => {
+      ws.send(JSON.stringify({
+        type: "initial_messages",
+        messages: messages
+      }));
+    });
+    
+    ws.on('message', async (data: Buffer) => {
+      try {
+        const parsed = JSON.parse(data.toString());
+        
+        if (parsed.type === 'send_message') {
+          const validatedData = userMessageSchema.parse(parsed.data);
+          
+          // Store message
+          const newMessage = await storage.createMessage({
+            content: validatedData.content,
+            role: "user",
+            userId: "user-" + Date.now(),
+            username: validatedData.username
+          });
+          
+          // Broadcast to all clients
+          const messageData = JSON.stringify({
+            type: "new_message",
+            message: newMessage
+          });
+          
+          wsClients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(messageData);
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao processar mensagem WebSocket:', error);
+      }
+    });
+    
+    ws.on('close', () => {
+      console.log('Conexão WebSocket fechada');
+      wsClients.delete(ws);
+    });
+    
+    ws.on('error', (error) => {
+      console.error('Erro WebSocket:', error);
+      wsClients.delete(ws);
+    });
+  });
+  
   return httpServer;
 }

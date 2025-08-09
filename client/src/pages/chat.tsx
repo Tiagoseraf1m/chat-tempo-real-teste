@@ -1,108 +1,94 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { type Message } from "@shared/schema";
+import { useWebSocket } from "@/hooks/use-websocket";
 import ChatHeader from "../components/chat-header";
 import ChatMessages from "../components/chat-messages";
 import ChatInput from "../components/chat-input";
+import UsernameModal from "../components/username-modal";
 
 export default function Chat() {
-  const [isTyping, setIsTyping] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+  const [showUsernameModal, setShowUsernameModal] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { messages, isConnected, connect, sendMessage, disconnect } = useWebSocket();
 
-  // Fetch messages
-  const { data: messages = [], isLoading } = useQuery<Message[]>({
-    queryKey: ["/api/messages"],
-    refetchInterval: false,
-  });
+  // Connect to WebSocket when username is set
+  useEffect(() => {
+    if (username && !isConnected) {
+      connect();
+    }
+    return () => {
+      if (username) {
+        disconnect();
+      }
+    };
+  }, [username, isConnected, connect, disconnect]);
 
-  // Send message mutation
-  const sendMessageMutation = useMutation({
-    mutationFn: async ({ content }: { content: string }) => {
-      const response = await apiRequest("POST", "/api/messages", {
-        content,
-        role: "user",
-        userId: "guest", // For demo purposes, using guest user
-      });
-      return response.json();
-    },
-    onMutate: () => {
-      setIsTyping(true);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-      setIsTyping(false);
-    },
-    onError: (error) => {
-      setIsTyping(false);
-      console.error("Error sending message:", error);
-      toast({
-        title: "Erro",
-        description: "Erro ao enviar mensagem. Tente novamente.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Clear chat mutation
-  const clearChatMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("DELETE", "/api/messages");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-      toast({
-        title: "Sucesso",
-        description: "Chat limpo com sucesso.",
-      });
-    },
-    onError: (error) => {
-      console.error("Error clearing chat:", error);
-      toast({
-        title: "Erro",
-        description: "Erro ao limpar chat. Tente novamente.",
-        variant: "destructive",
-      });
-    },
-  });
+  const handleUsernameSubmit = (newUsername: string) => {
+    setUsername(newUsername);
+    setShowUsernameModal(false);
+    toast({
+      title: "Conectado!",
+      description: `Bem-vindo ao chat, ${newUsername}!`,
+    });
+  };
 
   const handleSendMessage = (content: string) => {
-    if (content.trim() && !sendMessageMutation.isPending) {
-      sendMessageMutation.mutate({ content: content.trim() });
+    if (content.trim() && username && isConnected) {
+      sendMessage(content.trim(), username);
+    } else if (!isConnected) {
+      toast({
+        title: "Desconectado",
+        description: "Tentando reconectar...",
+        variant: "destructive",
+      });
     }
   };
 
   const handleClearChat = () => {
-    clearChatMutation.mutate();
+    // For now, just show a message - we could implement this later
+    toast({
+      title: "Info",
+      description: "Função de limpar chat não disponível no modo tempo real.",
+    });
   };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+  }, [messages]);
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="flex flex-col h-screen max-w-4xl mx-auto border-x border-slate-200 bg-white">
-        <ChatHeader onClearChat={handleClearChat} />
-        
-        <ChatMessages 
-          messages={messages} 
-          isLoading={isLoading}
-          isTyping={isTyping}
-        />
-        
-        <div ref={messagesEndRef} />
-        
-        <ChatInput 
-          onSendMessage={handleSendMessage}
-          isDisabled={sendMessageMutation.isPending}
-        />
+    <>
+      <UsernameModal 
+        isOpen={showUsernameModal} 
+        onSubmit={handleUsernameSubmit} 
+      />
+      
+      <div className="bg-slate-50 min-h-screen">
+        <div className="flex flex-col h-screen max-w-4xl mx-auto border-x border-slate-200 bg-white">
+          <ChatHeader 
+            onClearChat={handleClearChat} 
+            username={username}
+            isConnected={isConnected}
+          />
+          
+          <ChatMessages 
+            messages={messages} 
+            isLoading={false}
+            isTyping={false}
+            currentUsername={username}
+          />
+          
+          <div ref={messagesEndRef} />
+          
+          <ChatInput 
+            onSendMessage={handleSendMessage}
+            isDisabled={!isConnected || !username}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

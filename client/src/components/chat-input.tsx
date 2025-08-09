@@ -53,7 +53,7 @@ export default function ChatInput({ onSendMessage, isDisabled }: ChatInputProps)
               value={message}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Digite sua mensagem..."
+              placeholder={isDisabled ? "Conectando..." : "Digite sua mensagem..."}
               className="w-full resize-none rounded-2xl border border-slate-300 px-4 py-3 pr-12 text-sm placeholder-slate-400 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 bg-slate-50 transition-colors duration-200 min-h-[52px]"
               rows={1}
               maxLength={maxLength}
