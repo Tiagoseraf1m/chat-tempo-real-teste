@@ -120,15 +120,29 @@ O projeto está preparado para usar PostgreSQL com Drizzle ORM:
 
 ## 🤝 Contribuições
 
-Sinta-se livre para:
-- Fazer fork do projeto
+Respeitando a licença de uso restrito, você pode:
+- Fazer fork para fins de estudo
 - Abrir issues para bugs ou sugestões
-- Enviar pull requests com melhorias
-- Personalizar para suas necessidades
+- Personalizar para projetos pessoais não-comerciais
+- Usar como referência em projetos educacionais
 
 ## 📄 Licença
 
-Este projeto é de código aberto. Você pode usar, modificar e distribuir livremente.
+Este projeto possui **Licença de Uso Restrito para Avaliação e Estudo**.
+
+**Você PODE:**
+- Usar para fins educacionais e estudo
+- Usar em projetos pessoais não-comerciais  
+- Incluir no seu portfolio
+- Fazer avaliações técnicas
+
+**Você NÃO PODE:**
+- Usar comercialmente sem autorização
+- Vender ou distribuir comercialmente
+- Remover os avisos de copyright
+
+Para uso comercial, entre em contato com o autor original.
+Veja o arquivo `LICENSE` para detalhes completos.
 
 ---
 
