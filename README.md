@@ -84,16 +84,33 @@ OPENAI_API_KEY=sua_chave_aqui
 2. **Limite de Mensagens**: Modifique `maxLength` em `chat-input.tsx`
 3. **Validações**: Ajuste os schemas em `shared/schema.ts`
 
-## 🚀 Deploy
+## 🚀 Deploy e Teste Online
 
-### Vercel/Netlify
-1. Configure as variáveis de ambiente na plataforma
-2. O build será feito automaticamente com `npm run build`
+Para outras pessoas testarem seu chat em tempo real, você precisa fazer deploy. 
 
-### VPS/Servidor Próprio
+**Opções gratuitas mais fáceis:**
+
+### 1. Replit (Recomendado - mais fácil)
+1. Vá em [replit.com](https://replit.com)
+2. "Import from GitHub" → Cole URL do seu repositório
+3. Pressione "Run" → Seu chat estará online!
+
+### 2. Railway
+1. [railway.app](https://railway.app) → "Deploy from GitHub"
+2. Selecione seu repositório → Deploy automático
+
+### 3. Vercel
+1. [vercel.com](https://vercel.com) → "New Project"  
+2. Importe do GitHub → Deploy automático
+
+**Veja o arquivo `DEPLOY.md` para instruções detalhadas de cada plataforma.**
+
+### Teste Local (para desenvolvedores)
 ```bash
-npm run build
-npm start
+git clone [seu-repositorio]
+cd chat-tempo-real
+npm install
+npm run dev
 ```
 
 ## 🔄 Migração para Banco de Dados
