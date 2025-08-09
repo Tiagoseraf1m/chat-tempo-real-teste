@@ -1,8 +1,18 @@
-# AI Chat Assistant
+# Real-Time Multi-User Chat Application
 
 ## Overview
 
-This is a modern AI-powered chat application built with React and Express.js that provides intelligent conversational assistance in Portuguese. The application features a clean, responsive chat interface where users can interact with an OpenAI GPT-4o powered assistant that responds in Brazilian Portuguese. The system is designed as a full-stack web application with a React frontend, Express.js backend, and uses in-memory storage with the option to scale to PostgreSQL using Drizzle ORM.
+This is a modern real-time chat application built with React, Express.js, TypeScript, and WebSockets that enables multiple users to communicate instantly. The application features a clean, responsive chat interface where users can join with their names and chat with others in real-time. The system is designed as a full-stack web application with a React frontend, Express.js backend with WebSocket support, and uses in-memory storage with the option to scale to PostgreSQL using Drizzle ORM.
+
+## Recent Changes (August 9, 2025)
+
+- **Transformed from AI chat to real-time multi-user chat**: Replaced OpenAI integration with WebSocket-based real-time messaging
+- **Added multi-user support**: Multiple users can now chat simultaneously with unique usernames
+- **Implemented WebSocket communication**: Real-time bidirectional communication between clients and server
+- **Created username modal**: Users enter their name before joining the chat
+- **Enhanced message display**: Messages show sender names and timestamps, with visual distinction between own messages and others
+- **Added connection status**: Real-time connection indicators in the header
+- **Improved UX**: Auto-reconnection, better loading states, and responsive design
 
 ## User Preferences
 
