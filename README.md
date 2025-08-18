@@ -163,4 +163,4 @@ Veja o arquivo `LICENSE` para detalhes completos.
 
 ---
 
-Desenvolvido com ❤️ usando React, Express.js e WebSockets.
+Desenvolvido usando React, Express.js e WebSockets.
