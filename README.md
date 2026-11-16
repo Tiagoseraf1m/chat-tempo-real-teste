@@ -1,166 +1,137 @@
 # Chat em Tempo Real
 
-Um sistema de chat em tempo real multi-usuário construído com React, Express.js, TypeScript e WebSockets.
+Sistema de chat multiusuário desenvolvido com React, Express.js, TypeScript e WebSockets, permitindo a comunicação instantânea entre diferentes usuários por meio de uma interface web.
 
 ## ✨ Funcionalidades
 
-- **Chat em tempo real**: Mensagens instantâneas usando WebSockets
-- **Multi-usuário**: Várias pessoas podem conversar simultaneamente
-- **Interface moderna**: Design responsivo com Tailwind CSS
-- **Indicador de conexão**: Mostra status online/offline
-- **Reconexão automática**: Se reconecta automaticamente quando a conexão cai
-- **Identificação de usuário**: Mensagens próprias destacadas
-- **Validação de dados**: Validação robusta com Zod
+- **Chat em tempo real:** envio e recebimento instantâneo de mensagens utilizando WebSockets.
+- **Multiusuário:** permite que vários usuários participem simultaneamente da conversa.
+- **Interface responsiva:** layout desenvolvido com Tailwind CSS.
+- **Indicador de conexão:** exibe o status de conexão dos usuários.
+- **Reconexão automática:** tenta restabelecer a conexão quando ocorre uma interrupção.
+- **Identificação de mensagens:** diferencia as mensagens enviadas pelo próprio usuário das mensagens dos demais participantes.
+- **Validação de dados:** utilização do Zod para validar os dados recebidos.
 
 ## 🚀 Tecnologias Utilizadas
 
 ### Frontend
-- React 18 com TypeScript
-- Vite (build tool)
-- Tailwind CSS para estilização
-- Radix UI para componentes base
-- TanStack Query para gerenciamento de estado
-- Wouter para roteamento
-- Zod para validação
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Radix UI
+- TanStack Query
+- Wouter
+- Zod
 
 ### Backend
-- Express.js com TypeScript
-- WebSocket (ws) para comunicação em tempo real
-- Drizzle ORM (preparado para PostgreSQL)
-- Armazenamento em memória (pode ser facilmente migrado para banco de dados)
+- Node.js
+- Express.js
+- TypeScript
+- WebSocket (ws)
+- Drizzle ORM
 
-## 📦 Instalação
+### Armazenamento
+O projeto utiliza armazenamento em memória para gerenciar as mensagens. A estrutura também possui preparação para integração com PostgreSQL por meio do Drizzle ORM.
 
-### 1. Clone o projeto
-```bash
-git clone [seu-repositorio]
-cd chat-tempo-real
-```
+## 📁 Estrutura do Projeto
 
-### 2. Instale as dependências
-```bash
-npm install
-```
-
-### 3. Execute o projeto
-```bash
-npm run dev
-```
-
-O servidor será iniciado na porta 5000 e estará disponível em `http://localhost:5000`.
-
-## 🏗️ Estrutura do Projeto
-
-```
-├── client/                 # Frontend React
+```text
+├── client/
 │   ├── src/
 │   │   ├── components/    # Componentes reutilizáveis
-│   │   ├── hooks/         # Custom hooks
+│   │   ├── hooks/         # Hooks personalizados
 │   │   ├── lib/           # Utilitários e configurações
 │   │   └── pages/         # Páginas da aplicação
 │   └── index.html
-├── server/                # Backend Express
-│   ├── index.ts          # Ponto de entrada do servidor
-│   ├── routes.ts         # Rotas da API e WebSocket
-│   ├── storage.ts        # Camada de armazenamento
-│   └── vite.ts           # Configuração do Vite
-├── shared/               # Tipos e schemas compartilhados
-│   └── schema.ts
-└── package.json
+│
+├── server/
+│   ├── index.ts           # Inicialização do servidor
+│   ├── routes.ts          # Rotas da API e WebSocket
+│   ├── storage.ts         # Camada de armazenamento
+│   └── vite.ts            # Configuração do Vite
+│
+├── shared/
+│   └── schema.ts          # Schemas e tipos compartilhados
+│
+├── package.json
+└── README.md
 ```
 
-## 🔧 Configuração
+## ⚙️ Como executar o projeto
 
-### Variáveis de Ambiente (opcionais)
+### Pré-requisitos
 
-Se quiser integrar com OpenAI para um bot de chat:
+- Node.js instalado.
+- npm instalado.
+- Git instalado.
+
+### 1. Clonar o repositório
+
 ```bash
-OPENAI_API_KEY=sua_chave_aqui
+git clone https://github.com/Tiagoseraf1m/chat-tempo-real-teste.git
 ```
 
-### Personalização
+### 2. Acessar a pasta do projeto
 
-1. **Cores e Design**: Edite `client/src/index.css` para personalizar as cores
-2. **Limite de Mensagens**: Modifique `maxLength` em `chat-input.tsx`
-3. **Validações**: Ajuste os schemas em `shared/schema.ts`
-
-## 🚀 Deploy e Teste Online
-
-Para outras pessoas testarem seu chat em tempo real, você precisa fazer deploy. 
-
-**Opções gratuitas mais fáceis:**
-
-### 1. Replit (Recomendado - mais fácil)
-1. Vá em [replit.com](https://replit.com)
-2. "Import from GitHub" → Cole URL do seu repositório
-3. Pressione "Run" → Seu chat estará online!
-
-### 2. Railway
-1. [railway.app](https://railway.app) → "Deploy from GitHub"
-2. Selecione seu repositório → Deploy automático
-
-### 3. Vercel
-1. [vercel.com](https://vercel.com) → "New Project"  
-2. Importe do GitHub → Deploy automático
-
-**Veja o arquivo `DEPLOY.md` para instruções detalhadas de cada plataforma.**
-
-### Teste Local (para desenvolvedores)
 ```bash
-git clone [seu-repositorio]
-cd chat-tempo-real
+cd chat-tempo-real-teste
+```
+
+### 3. Instalar as dependências
+
+```bash
 npm install
+```
+
+### 4. Executar a aplicação
+
+```bash
 npm run dev
 ```
 
-## 🔄 Migração para Banco de Dados
+Após a inicialização, a aplicação estará disponível em:
 
-O projeto está preparado para usar PostgreSQL com Drizzle ORM:
+```text
+http://localhost:5000
+```
 
-1. Configure a variável `DATABASE_URL`
-2. Execute as migrações: `npm run db:push`
-3. Substitua `MemStorage` por `DbStorage` em `server/routes.ts`
+## 🔄 Como funciona a comunicação em tempo real
 
-## 📝 Como Funciona
+A comunicação entre os usuários é realizada por meio de WebSockets, utilizando o servidor como intermediário.
 
-### WebSocket
-- Conexão estabelecida em `/ws`
-- Mensagens enviadas em tempo real para todos os clientes conectados
-- Reconexão automática em caso de falha
+### Fluxo de funcionamento
 
-### Fluxo de Mensagens
-1. Usuário digita nome e entra no chat
-2. Mensagem é enviada via WebSocket
-3. Servidor valida e armazena a mensagem
-4. Mensagem é transmitida para todos os clientes conectados
-5. Interface atualizada instantaneamente
+1. O usuário acessa a aplicação e informa seu nome.
+2. Uma conexão WebSocket é estabelecida com o servidor.
+3. O usuário envia uma mensagem pela interface.
+4. O servidor recebe e valida os dados.
+5. A mensagem é armazenada em memória.
+6. O servidor transmite a mensagem aos usuários conectados.
+7. As interfaces dos participantes são atualizadas em tempo real.
 
-## 🤝 Contribuições
+### Conexão WebSocket
 
-Respeitando a licença de uso restrito, você pode:
-- Fazer fork para fins de estudo
-- Abrir issues para bugs ou sugestões
-- Personalizar para projetos pessoais não-comerciais
-- Usar como referência em projetos educacionais
+O sistema utiliza o seguinte endpoint:
+
+```text
+/ws
+```
+
+## 🗄️ Banco de Dados
+
+Atualmente, o sistema utiliza armazenamento em memória para gerenciar as mensagens.
+
+O projeto possui estrutura preparada para uma futura integração com PostgreSQL utilizando Drizzle ORM.
+
+A persistência em banco de dados poderá ser implementada em versões futuras.
+
+## 📌 Observações
+
+- As mensagens são armazenadas em memória e não possuem persistência após a reinicialização do servidor.
+- O sistema utiliza WebSockets para comunicação instantânea entre os participantes.
+- O projeto pode receber novas funcionalidades e melhorias em versões futuras.
 
 ## 📄 Licença
 
-Este projeto possui **Licença de Uso Restrito para Avaliação e Estudo**.
-
-**Você PODE:**
-- Usar para fins educacionais e estudo
-- Usar em projetos pessoais não-comerciais  
-- Incluir no seu portfolio
-- Fazer avaliações técnicas
-
-**Você NÃO PODE:**
-- Usar comercialmente sem autorização
-- Vender ou distribuir comercialmente
-- Remover os avisos de copyright
-
-Para uso comercial, entre em contato com o autor original.
-Veja o arquivo `LICENSE` para detalhes completos.
-
----
-
-Desenvolvido usando React, Express.js e WebSockets.
+Este projeto está associado à licença MIT. Consulte o arquivo `LICENSE` para conhecer as condições de utilização, modificação e distribuição.
